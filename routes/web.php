@@ -35,7 +35,7 @@ Route::get('/editer-candidat/{id}', [CandidatController::class, 'edit'])->name('
 Route::post('/modifier/candidat/{id}', [CandidatController::class, 'update'])->name('update.candidat');
 
 
-Route::get('/pdf/{filename}', [CandidatController::class, 'downloadPDF'])->name('pdf.download');
+// Route::get('/pdf/{filename}', [CandidatController::class, 'downloadPDF'])->name('pdf.download');
 
 
 //Route module

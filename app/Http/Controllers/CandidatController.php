@@ -91,10 +91,13 @@ public function store(Request $request)
     $candidat->adresse = $validated['adresse'];
     $candidat->domaine = $validated['domaine'];
     $candidat->question = $validated['question'];
+
     if ($request->hasFile('myfile')) {
-        $file = $request->file('myfile');
-        $path = $file->store('public/storages/assets');
-        $candidat->myfile = $path;
+        $file= $candidat->myfile = $request->file('myfile');
+        $extension =$file->getClientOriginalExtension();
+         $filename = time().'.'.$extension;
+        $file->move("file",$filename);
+        $candidat->myfile = $filename;
     }
     $candidat->save();
     // Envoyer un e-mail de notification
