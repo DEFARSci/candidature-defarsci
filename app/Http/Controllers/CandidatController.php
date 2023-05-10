@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Candidat;
 use App\Models\Module;
+use App\Models\Candidat;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CandidatureNotification;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 
 class CandidatController extends Controller
 {
@@ -56,22 +61,49 @@ class CandidatController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        $candidat = new Candidat();
-        $candidat->email = $request->email;
-        $candidat->nom = $request->nom;
-        $candidat->prenom = $request->prenom;
-        $candidat->telephone = $request->telephone;
-        $candidat->adresse = $request->adresse;
-        $candidat->domaine = $request->domaine;
-        $candidat->myfile = $request->myfile;
-        $candidat->question = $request->question;
+//
+public function store(Request $request)
+{
+    // validation des données
+    $validated = $request->validate([
+        'email' => 'required|email',
+        'nom' => 'required|string|max:255',
+        'prenom' => 'required|string|max:255',
+        'telephone' => 'required|string|max:20',
+        'adresse' => 'required|string|max:255',
+        'domaine' => 'required|string|max:255',
+        'question' => 'nullable|string',
+        'myfile' => 'required|mimes:pdf|max:2048'
+    ]);
 
-        $candidat->save();
+    // stocker le fichier dans le dossier public
+    //$path = $request->file('myfile')->store('public/cv');
 
-        return redirect()->back()->with('success','candidat enregistré');
+    // récupérer le contenu du fichier
+    //$content = file_get_contents(storage_path('app/' . $path));
+
+    // enregistrer les données dans la base de données
+    $candidat = new Candidat();
+    $candidat->email = $validated['email'];
+    $candidat->nom = $validated['nom'];
+    $candidat->prenom = $validated['prenom'];
+    $candidat->telephone = $validated['telephone'];
+    $candidat->adresse = $validated['adresse'];
+    $candidat->domaine = $validated['domaine'];
+    $candidat->question = $validated['question'];
+    if ($request->hasFile('myfile')) {
+        $file = $request->file('myfile');
+        $path = $file->store('public/storages/assets');
+        $candidat->myfile = $path;
     }
+    $candidat->save();
+    // Envoyer un e-mail de notification
+    Mail::to($validated['email'])->send(new CandidatureNotification($validated['email']));
+
+    // afficher un message de succès
+    return back()->with('success', 'Votre candidature a été enregistrée avec succès!');
+}
+
 
     /**
      * Display the specified resource.
@@ -81,10 +113,32 @@ class CandidatController extends Controller
      */
     public function show($id)
     {
-        $candidat = Candidat::find($id);
+        $candidat = Candidat::findOrFail($id);
 
+//dd($candidat);
         return view('candidat.montrer',compact('candidat'));
+
     }
+//     public function downloadPDF($filename)
+// {
+//     // Vérifier si le fichier existe dans le dossier de stockage
+//     if (Storage::exists('pdf/' . $filename)) {
+//         // Récupérer le contenu du fichier
+//         $file = Storage::get('pdf/' . $filename);
+//         // Définir le type de contenu
+//         $type = Storage::mimeType('pdf/' . $filename);
+//         // Définir les en-têtes HTTP pour le téléchargement
+//         $headers = [
+//             'Content-Type' => $type,
+//             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+//         ];
+//         // Retourner la réponse avec le contenu du fichier, les en-têtes HTTP et le code d'état 200 (OK)
+//         return response($file, 200, $headers);
+//     }
+//     // Si le fichier n'existe pas, retourner une erreur 404 (NOT FOUND)
+//     abort(404);
+// }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -108,7 +162,10 @@ class CandidatController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $candidat = Candidat::findOrFail($id);
+        // $candidat->update($request->all());
+
+        $candidat->update($request->except('myfile'));
     }
 
     /**

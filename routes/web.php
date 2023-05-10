@@ -16,20 +16,26 @@ use App\Http\Controllers\ModuleController;
 */
 
 // Route::get('/', function () {
-//     return view('welcome');
-// });
+//     // $candidat = Candidat::find(1);
+//     // dd($candidat);
+//     return view('welcome', compact('candidat'));
+//  });
 
 
 //Route candidat
 
 
 Route::get('/', [CandidatController::class, 'index']);
+
 Route::get('/liste/candidat', [CandidatController::class, 'liste'])->name('liste.candidat');;
 Route::post('/enregistrer/candidat', [CandidatController::class, 'store'])->name('store.candidat');
-Route::post('/montrer/candidat', [CandidatController::class, 'show'])->name('show.candidat');
+Route::get('/montrer/candidat/{id}', [CandidatController::class, 'show'])->name('show.candidat');
 Route::get('/supprimer-candidat/{id}', [CandidatController::class, 'destroy'])->name('delete-candidat');
 Route::get('/editer-candidat/{id}', [CandidatController::class, 'edit'])->name('edit-candidat');
 Route::post('/modifier/candidat/{id}', [CandidatController::class, 'update'])->name('update.candidat');
+
+
+Route::get('/pdf/{filename}', [CandidatController::class, 'downloadPDF'])->name('pdf.download');
 
 
 //Route module

@@ -16,7 +16,7 @@
 
         <div class="card-header bg-info text-black fs-5 fw-bold text-center">FORMATION DE STAGE 100% PRATIQUE</div>
         <div class="card-body">
-            <form action="{{route('store.candidat')}}" method="post">
+            <form action="{{route('store.candidat')}}" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="form-group">
                     <label for="email">Adresse Email:</label>

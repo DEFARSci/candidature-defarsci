@@ -54,7 +54,7 @@
                         <td>
                             <a href="{{route('edit-candidat',$candidats->id )}}" class="btn btn-success"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                             <a onclick="return confirm('Souhaitez-vous le supprimer')" href="{{route('delete-candidat',$candidats->id)}}" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>
-                            {{-- <a onclick="return confirm('Souhaitez-vous le supprimer')" href="{{route('-candidat',$candidats->id)}}" class="btn btn-secondary"><i class="fa fa-eye"></i></a> --}}
+                            <a href="{{route('show.candidat',$candidats->id)}}" class="btn btn-secondary"><i class="fa fa-eye"></i></a>
                         </td>
                     </tr>
                 @endforeach
